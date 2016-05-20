@@ -60,7 +60,7 @@ function deleteEmployee(event) {
  var empID = getEmpId($(this));
 
   $.ajax({
-    type: 'DELETE',
+    type: 'POST',
     url: '/employees/' + empID,
     success: function (data) {
       getEmployees();

@@ -10,7 +10,7 @@ router.get('/', function (req, res) {
       res.sendState(500);
     }
 
-    client.query('SELECT * FROM employees', function (err, result) {
+    client.query('SELECT * FROM employees WHERE active = true', function (err, result) {
       done();
       res.send(result.rows);
     });
@@ -27,7 +27,7 @@ router.post('/', function (req, res) {
 });
 });
 
-router.delete('/:id', function (req, res) {
+router.post('/:id', function (req, res) {
   var id = req.params.id;
    console.log(id);
    pg.connect(connectionString, function (err, client, done) {
@@ -36,8 +36,7 @@ router.delete('/:id', function (req, res) {
       res.sendStatus(500);
      }
 
-    client.query('DELETE FROM employees ' +
-                   'WHERE employees.id = $1',
+    client.query('UPDATE employees SET active = false WHERE employees.id = $1',
                    [id],
                    function (err, result) {
                      done();
@@ -60,7 +59,7 @@ router.delete('/:id', function (req, res) {
      if (err) {
        res.sendState(500);
      }
-     client.query('SELECT SUM(salary) / 12 AS monthly FROM employees', function (err, result) {
+     client.query('SELECT SUM(salary) / 12 AS monthly FROM employees WHERE active = true', function (err, result) {
      total = (result.rows[0].monthly);
      done();
      res.send(total);
