@@ -53,4 +53,21 @@ router.delete('/:id', function (req, res) {
    });
  });
 
+ router.get('/payroll', function (req, res) {
+   var total;
+
+   pg.connect(connectionString, function (err, client, done){
+     if (err) {
+       res.sendState(500);
+     }
+     client.query('SELECT SUM(salary) / 12 AS monthly FROM employees', function (err, result) {
+     total = (result.rows[0].monthly);
+     done();
+     res.send(total);
+   });
+
+   });
+ });
+
+
 module.exports = router;

@@ -1,6 +1,6 @@
 $(document).ready(function (){
-var staff = [];
 getEmployees();
+getPayroll();
 
 //Add employee
 $('.employeeinfo').on('submit', addEmployee);
@@ -9,25 +9,6 @@ $('.employeeinfo').on('submit', addEmployee);
 $('#employeeList').on('click', '.deleteEmp', deleteEmployee);
 
 });
-
-function totalSalaries(array) {
-  var totalSalary = 0;
-  var monthlySalary = 0;
-for (var i = 0; i < array.length; i++) {
-  console.log(array[i]);
-totalSalary += parseInt(array[i].employeesalary);
-  monthlySalary = Math.round(totalSalary / 12);
-  }
-  return monthlySalary;
-}
-
-function appendSalary(monthlySalary) {
-
-  $('#container').append('<div class="payroll"></div>');
-    var $pr = $('#container').children().last();
-
-    $pr.append('<p>Total Monthly Salary: ' + monthlySalary + '</p>');
-}
 
 //Utility function
 function getEmpId(button) {
@@ -51,8 +32,6 @@ function getEmployees () {
               $($container).append('<button class="deleteEmp">Delete</button>');
               $container.data('empID', emp.id);
           });
-
-
 
 }
 });
@@ -80,7 +59,6 @@ function deleteEmployee(event) {
 
  var empID = getEmpId($(this));
 
-
   $.ajax({
     type: 'DELETE',
     url: '/employees/' + empID,
@@ -89,3 +67,15 @@ function deleteEmployee(event) {
     },
   });
 }
+
+function getPayroll () {
+$.ajax({
+    type: 'GET',
+    url: '/employees/payroll',
+    success: function (data) {
+      console.log(data);
+      $('#payroll').empty();
+      $('#payroll').append('$' + data);
+    }
+  });
+};
