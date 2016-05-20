@@ -1,20 +1,12 @@
 $(document).ready(function (){
 var staff = [];
 getEmployees();
-//Places info into object, adds object to array, &c.
+
+//Add employee
 $('.employeeinfo').on('submit', addEmployee);
 
-  $('#employeeinfo').find('input[type=text]').val('');
-  $('#employeeinfo').find('input[type=number]').val('');
-
-
-
-
-
-//Deletes entry
-$('.person').on('click', 'button', function () {
-  $(this).parent().remove();
-});
+//Deletes employee
+$('#employeeList').on('click', '.deleteEmp', deleteEmployee);
 
 });
 
@@ -36,26 +28,30 @@ function appendSalary(monthlySalary) {
 
     $pr.append('<p>Total Monthly Salary: ' + monthlySalary + '</p>');
 }
+
+//Utility function
+function getEmpId(button) {
+  // get the employee ID
+  var empId = button.parent().data('empID');
+  console.log('getEmpId', empId);
+  return empId;
+}
+
 //AJAX functions
 function getEmployees () {
   $.ajax({
       type: 'GET',
       url: '/employees',
       success: function (employees) {
-        console.log(employees);
         $('#employeeList').empty();
           employees.forEach(function (emp) {
-            console.log(emp);
-            $container = $('<div></div>');
-            var empData = ['first_name', 'last_name', 'title', 'salary'];
-          empData.forEach(function (prop) {
-              var $el = $('<div id="' + prop + '" name="' + prop + '" />');
-              $el.val(emp[prop]);
-              $container.append($el);
+
+            $container = $('<div class="data">' + emp.first_name + " " + emp.last_name + ': ' + emp.title + ' Salary: ' + emp.salary + '</div>');
               $('#employeeList').append($container);
+              $($container).append('<button class="deleteEmp">Delete</button>');
+              $container.data('empID', emp.id);
           });
-          $container.data('empID', employees.id);
-        });
+
 
 
 }
@@ -69,13 +65,27 @@ function addEmployee (event) {
   $.each($('.employeeinfo').serializeArray(), function (i, field) {
     employee[field.name] = field.value;
   });
-  console.log(employee);
   $.ajax({
     type: 'POST',
     url: '/employees',
     data: employee,
     success: function (data) {
-      console.log(data);
+
     }
   });
 };
+
+function deleteEmployee(event) {
+  event.preventDefault();
+
+ var empID = getEmpId($(this));
+
+
+  $.ajax({
+    type: 'DELETE',
+    url: '/employees/' + empID,
+    success: function (data) {
+      getEmployees();
+    },
+  });
+}
